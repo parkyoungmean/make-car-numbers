@@ -36,7 +36,7 @@
 
         <!-- 번호 입력 -->
         <div class="flex space-x-4 items-center">
-          <label class="text-lg font-semibold">번호:</label>
+          <label class="text-lg font-semibold">시작 번호:</label>
           <input
             type="text"
             v-model="data.startNumber"
@@ -44,48 +44,80 @@
             class="border px-2 py-1 rounded w-32 text-center"
             placeholder="숫자 5자리"
           />
+          <label for="" class="text-lg font-semibold">종료 번호:</label>
+          <input
+            type="text"
+            v-model="data.endNumber"
+            maxlength="5"
+            class="border px-2 py-1 rounded w-32 text-center"
+            placeholder="숫자 5자리"
+          />
         </div>
 
         <!-- 임시운행번호판 SVG -->
-        <svg
-          viewBox="0 0 520 110"
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-[520px] h-[110px] border border-black bg-white"
-        >
-        <!-- 외곽 테두리 -->
-        <rect x="0" y="0" width="520" height="110" fill="white" stroke="black" />
-          
-          <!-- 대각선 선 두 줄 -->
-    <svg class="absolute top-0 left-0 w-full h-full">
-      <line x1="181" y1="110" x2="390" y2="0" stroke="red" stroke-width="3" />
-      <line x1="254" y1="110" x2="463" y2="0" stroke="red" stroke-width="3" />
-    </svg>
-
-          <!-- 날짜 영역 -->
-          <text x="30" y="35" font-size="25" font-weight="bold" fill="black">
-            {{ formattedStartDate }}
-          </text>
-          <text x="30" y="60" font-size="25" font-weight="bold" fill="black">
-            ~{{ formattedEndDate }} 까지
-          </text>
-          <text x="35" y="90" font-size="27" font-weight="bold" fill="black">
-            {{ data.authority }}
-          </text>
-
-          <!-- 숫자 번호 -->
-          <text
-            x="325"
-            y="90"
-            font-size="100"
-            font-weight="bold"
-            text-anchor="middle"
-            fill="black"
-            letter-spacing="8"
-            font-family="Arial, sans-serif"
+        <div v-for="num in generatedNumbers" :key="num">
+          <svg
+            viewBox="0 0 520 110"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-[520px] h-[110px] border border-black bg-white mb-4"
           >
-            {{ data.startNumber }}
-          </text>
-        </svg>
+            <!-- 외곽 테두리 -->
+            <rect
+              x="0"
+              y="0"
+              width="520"
+              height="110"
+              fill="white"
+              stroke="black"
+            />
+
+            <!-- 대각선 선 두 줄 -->
+            <svg class="absolute top-0 left-0 w-full h-full">
+              <line
+                x1="181"
+                y1="110"
+                x2="390"
+                y2="0"
+                stroke="red"
+                stroke-width="3"
+              />
+              <line
+                x1="254"
+                y1="110"
+                x2="463"
+                y2="0"
+                stroke="red"
+                stroke-width="3"
+              />
+            </svg>
+
+            <!-- 날짜 영역 -->
+            <text x="30" y="35" font-size="25" font-weight="bold" fill="black">
+              {{ formattedStartDate }}
+            </text>
+            <text x="30" y="60" font-size="25" font-weight="bold" fill="black">
+              ~{{ formattedEndDate }} 까지
+            </text>
+            <text x="35" y="90" font-size="27" font-weight="bold" fill="black">
+              {{ data.authority }}
+            </text>
+
+            <!-- 숫자 번호 -->
+            <text
+              x="325"
+              y="90"
+              font-size="100"
+              font-weight="bold"
+              text-anchor="middle"
+              fill="black"
+              letter-spacing="8"
+              font-family="Arial, sans-serif"
+            >
+              {{ num }}
+            </text>
+          </svg>
+        </div>
+
         <div class="field is-grouped">
           <div class="control">
             <button class="button is-link">[번호 생성]</button>
@@ -100,15 +132,15 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 /* import { useNumberStore } from '../store/numberStore'; */
 import { useRouter } from "vue-router";
 /* const numberStore = useNumberStore(); */
 const router = useRouter();
 const data = ref({
   authority: "",
-  firstNumber: "",
-  lastNumber: "",
+  startNumber: "",
+  endNumber: "",
 });
 
 const validUntil = ref("2025-04-30");
@@ -121,7 +153,6 @@ const updateDate = () => {
   validUntil.value = formatDate(dateInput.value);
 };
 
-/* 5 */
 const startDateInput = ref("2025-04-06");
 const endDateInput = ref("2025-04-15");
 
@@ -139,6 +170,20 @@ const updateStart = () => {
 const updateEnd = () => {
   formattedEndDate.value = formatDate(endDateInput.value, true);
 };
+
+
+const padNumber = (num) => num.toString().padStart(5, '0');
+
+const generatedNumbers = computed(() => {
+  const start = parseInt(data.value.startNumber);
+  const end = parseInt(data.value.endNumber);
+  if (isNaN(start) || isNaN(end) || start > end) return [];
+  const range = [];
+  for (let i = start; i <= end; i++) {
+    range.push(padNumber(i));
+  }
+  return range;
+});
 
 const submitForm = async () => {
   const formData = new FormData();
