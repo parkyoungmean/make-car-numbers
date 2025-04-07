@@ -1,115 +1,153 @@
 <template>
-    <div class="content">
-        <h2 class="title">번호 등록</h2>
-        <form @submit.prevent="submitForm">
-            <div class="field">
-                <label for="" class="label">제목</label>
-                <div class="control">
-                    <input type="text" class="input" v-model="data.regionText" required />
-                </div>
-            </div>
-            <div class="field">
-                <label for="" class="label">시작번호</label>
-                <div class="control">
-                    <input type="text" class="input" v-model="data.firstNumber" required />
-                </div>
-            </div>
-            <div class="field">
-                <label for="" class="label">끝번호</label>
-                <div class="control">
-                    <input type="text" class="input" v-model="data.lastNumber" required />
-                </div>
-            </div>
-            <div class="field is-grouped">
-                <div class="control">
-                    <button class="button is-link">[번호 생성]</button>
-                </div>
-                <div class="control">
-                    <button type="button" class="button" @click="goToMain">취소</button>
-                </div>
-            </div>
-        </form>
+  <div class="content">
+    <h2 class="title">임시 자동차 번호 등록</h2>
+    <!-- 5 -->
+    <form @submit.prevent="submitForm">
+      <div class="flex flex-col items-center p-10 bg-gray-100 space-y-6">
+        <!-- 시작일 & 종료일 선택기 -->
+        <div class="flex space-x-4 items-center">
+          <label class="text-lg font-semibold">시작일:</label>
+          <input
+            type="date"
+            v-model="startDateInput"
+            @change="updateStart"
+            class="border px-2 py-1 rounded"
+          />
+          <label class="text-lg font-semibold">종료일:</label>
+          <input
+            type="date"
+            v-model="endDateInput"
+            @change="updateEnd"
+            class="border px-2 py-1 rounded"
+          />
+        </div>
 
-        <!-- 01 tailwind -->
-        <!-- 번호판 -->
-        <div class="flex justify-center">
-        <div 
-        class="relative w-[400px] h-[200px] flex flex-col items-center justify-center rounded-lg border-4 shadow-lg"
+        <!-- 관할 기관 드롭다운 -->
+        <div class="flex items-center space-x-4">
+          <label class="text-lg font-semibold">관할 기관:</label>
+          <select v-model="data.authority" class="border px-2 py-1 rounded">
+            <option value="화성시장">화성시장</option>
+            <option value="서울특별시장">서울특별시장</option>
+            <option value="부산광역시장">부산광역시장</option>
+            <option value="경기도지사">경기도지사</option>
+            <option value="제주도지사">제주도지사</option>
+          </select>
+        </div>
+
+        <!-- 번호 입력 -->
+        <div class="flex space-x-4 items-center">
+          <label class="text-lg font-semibold">번호:</label>
+          <input
+            type="text"
+            v-model="data.startNumber"
+            maxlength="5"
+            class="border px-2 py-1 rounded w-32 text-center"
+            placeholder="숫자 5자리"
+          />
+        </div>
+
+        <!-- 임시운행번호판 SVG -->
+        <svg
+          viewBox="0 0 520 110"
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-[520px] h-[110px] border border-black bg-white"
         >
-            <!-- 지역 및 문자 -->
-            <span class="absolute top-6 left-6 text-[30px] font-bold tracking-wide">{{ data.regionText }}</span>
+        <!-- 외곽 테두리 -->
+        <rect x="0" y="0" width="520" height="110" fill="white" stroke="black" />
+          
+          <!-- 대각선 선 두 줄 -->
+    <svg class="absolute top-0 left-0 w-full h-full">
+      <line x1="181" y1="110" x2="390" y2="0" stroke="red" stroke-width="3" />
+      <line x1="254" y1="110" x2="463" y2="0" stroke="red" stroke-width="3" />
+    </svg>
 
-            <!-- 번호 -->
-            <span class="text-[65px] font-bold tracking-wide">{{ data.firstNumber }}</span>
+          <!-- 날짜 영역 -->
+          <text x="30" y="35" font-size="25" font-weight="bold" fill="black">
+            {{ formattedStartDate }}
+          </text>
+          <text x="30" y="60" font-size="25" font-weight="bold" fill="black">
+            ~{{ formattedEndDate }} 까지
+          </text>
+          <text x="35" y="90" font-size="27" font-weight="bold" fill="black">
+            {{ data.authority }}
+          </text>
+
+          <!-- 숫자 번호 -->
+          <text
+            x="325"
+            y="90"
+            font-size="100"
+            font-weight="bold"
+            text-anchor="middle"
+            fill="black"
+            letter-spacing="8"
+            font-family="Arial, sans-serif"
+          >
+            {{ data.startNumber }}
+          </text>
+        </svg>
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-link">[번호 생성]</button>
+          </div>
+          <div class="control">
+            <button type="button" class="button" @click="goToMain">취소</button>
+          </div>
         </div>
-        </div>
-
-        {{ data.regionText }} | {{ data.firstNumber }} | {{ data.lastNumber }}
-        <!-- 2 -->
-        <div class="flex justify-center p-10 bg-gray-100">
-            <svg :width="plateWidth" :height="plateHeight" viewBox="0 0 400 200">
-            <!-- 번호판 배경 -->
-            <rect x="0" y="0" width="400" height="200" fill="white" stroke="black" stroke-width="8" rx="10" ry="10"/>
-            
-            <!-- 지역 또는 한글 문자 -->
-            <text x="50" y="70" font-size="40" font-weight="bold" fill="black">{{ data.regionText }}</text>
-            
-            <!-- 숫자 부분 -->
-            <text x="100" y="150" font-size="70" font-weight="bold" fill="black">{{ data.firstNumber }}</text>
-            </svg>
-        </div>
-
-        <!-- 3 -->
-        <div class="flex justify-center p-10 bg-gray-100">
-            <svg
-            viewBox="0 0 335 155"
-            width="500"
-            height="230"
-            xmlns="http://www.w3.org/2000/svg"
-            class="rounded border shadow-md"
-            >
-            <!-- 배경 -->
-            <rect width="335" height="155" fill="white" stroke="black" stroke-width="4" rx="10" />
-
-            <!-- '임시' 텍스트 -->
-            <text x="20" y="40" font-size="28" font-weight="bold" fill="black">{{ data.regionText }}</text>
-
-            <!-- 차량 번호 -->
-            <text x="167" y="90" font-size="40" font-weight="bold" text-anchor="middle" fill="black">
-                {{ data.firstNumber }}
-            </text>
-
-            <!-- 유효기간 -->
-            <!-- <text x="167" y="135" font-size="16" text-anchor="middle" fill="black">
-                {{ validUntil }}까지
-            </text> -->
-            </svg>
-        </div>
-    </div>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 /* import { useNumberStore } from '../store/numberStore'; */
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 /* const numberStore = useNumberStore(); */
 const router = useRouter();
 const data = ref({
-    regionText: '', firstNumber: '', lastNumber: '',
+  authority: "",
+  firstNumber: "",
+  lastNumber: "",
 });
-const plateWidth = 400;
-const plateHeight = 200;
+
+const validUntil = ref("2025-04-30");
+
+// 날짜 입력용 값 (HTML date input에 사용)
+const dateInput = ref("2025-04-30");
+
+// 날짜 변경 시 유효기간 갱신
+const updateDate = () => {
+  validUntil.value = formatDate(dateInput.value);
+};
+
+/* 5 */
+const startDateInput = ref("2025-04-06");
+const endDateInput = ref("2025-04-15");
+
+const formattedStartDate = ref("25.04.06");
+const formattedEndDate = ref("04.15");
+
+const formatDate = (dateStr, short = false) => {
+  const [yyyy, mm, dd] = dateStr.split("-");
+  return short ? `${mm}.${dd}` : `${yyyy.slice(2)}.${mm}.${dd}`;
+};
+
+const updateStart = () => {
+  formattedStartDate.value = formatDate(startDateInput.value);
+};
+const updateEnd = () => {
+  formattedEndDate.value = formatDate(endDateInput.value, true);
+};
 
 const submitForm = async () => {
-    const formData = new FormData();
-    formData.append('region', data.value.regionText);
-    formData.append('first', data.value.firstNumber);
-    formData.append('last', data.value.lastNumber);
-    /* await numberStore.insertData(formData); */
-}
-
+  const formData = new FormData();
+  formData.append("region", data.value.authority);
+  formData.append("first", data.value.firstNumber);
+  formData.append("last", data.value.lastNumber);
+  /* await numberStore.insertData(formData); */
+};
 </script>
 
 <style scoped>
-
 </style>
