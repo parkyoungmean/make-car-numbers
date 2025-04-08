@@ -1,9 +1,7 @@
 <template>
   <div class="content">
-    <h2 class="title">임시 자동차 번호 등록</h2>
-    <!-- 5 -->
     <form @submit.prevent="submitForm">
-      <div class="flex flex-col items-center p-10 bg-gray-100 space-y-6">
+      <div class="flex flex-col items-center p-10 space-y-6">
         <!-- 시작일 & 종료일 선택기 -->
         <div class="flex space-x-4 items-center">
           <label class="text-lg font-semibold">시작일:</label>

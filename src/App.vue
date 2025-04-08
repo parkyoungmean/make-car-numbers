@@ -1,12 +1,12 @@
 <template>
   <div>
-    <HeaderComp />
+    <HeaderComp class="fixed top-0 left-0 w-full z-50" />
     <section class="section">
-      <div class="container">
+      <div class="container pt-14 pb-5">
         <router-view />
       </div>
     </section>
-    <FooterComp />
+    <FooterComp class="fixed bottom-0 left-0 w-full z-50" />
   </div>
 </template>
 
@@ -24,7 +24,7 @@ import FooterComp from './components/FooterComp.vue'
 }
 
 nav {
-  padding: 30px;
+  padding: 17px;
 }
 
 nav a {
