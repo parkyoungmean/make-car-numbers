@@ -24,12 +24,15 @@
         <div class="flex items-center space-x-4">
           <label class="text-lg font-semibold">관할 기관:</label>
           <select v-model="data.authority" class="border px-2 py-1 rounded">
+            <option disabled value="">선택 또는 직접 입력</option>
             <option value="화성시장">화성시장</option>
             <option value="서울특별시장">서울특별시장</option>
             <option value="부산광역시장">부산광역시장</option>
             <option value="경기도지사">경기도지사</option>
             <option value="제주도지사">제주도지사</option>
+            <option value="custom">직접 입력</option>
           </select>
+          <input v-if="data.authority === 'custom'" type="text" v-model="customAuthority" placeholder="기관명을 입력하세요." class="border px-2 py-1 rounded">
         </div>
 
         <!-- 번호 입력 -->
@@ -67,7 +70,7 @@
         </div>
 
         <!-- 임시운행번호판 SVG -->
-        <div v-for="num in generatedNumbers" :key="num">
+        <div v-show="showPlates" v-for="num in generatedNumbers" :key="num">
           <svg
             viewBox="0 0 520 110"
             xmlns="http://www.w3.org/2000/svg"
@@ -149,6 +152,10 @@ const data = ref({
   endNumber: "",
 });
 
+const customAuthority = ref('');
+
+const showPlates = ref(false);
+
 const startDateInput = ref("2025-04-06");
 const endDateInput = ref("2025-04-15");
 
@@ -179,6 +186,13 @@ const generatedNumbers = computed(() => {
   }
   return range;
 });
+
+/* watch(customAuthority, (val) => {
+  console.log('vla값:', val);
+    if (data.value.authority === 'custom' || data.value.authority === val) {
+    data.value.authority = val;
+  }
+}); */
 
 const exportToPDF = async () => {
   await nextTick();
@@ -230,11 +244,22 @@ const exportToPDF = async () => {
 };
 
 const submitForm = async () => {
+  await nextTick(); // DOM 업데이트 기다림
+  if (data.value.authority === 'custom') {
+    data.value.authority = customAuthority.value;
+  }
+
+// 재렌더링을 위해 먼저 false 처리
+  showPlates.value = false;
+  await nextTick(); // DOM 업데이트 기다림
+
   const formData = new FormData();
   formData.append("authority", data.value.authority);
   formData.append("start", data.value.startNumber);
   formData.append("end", data.value.endNumber);
   /* await numberStore.insertData(formData); */
+
+  showPlates.value = true; // 다시 보여줌
 };
 </script>
 
