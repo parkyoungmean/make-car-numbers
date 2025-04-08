@@ -244,8 +244,8 @@ const reset = () => {
 };
 
 const exportToPDF = async () => {
-  await nextTick();
-  await delay(100);
+  /* await nextTick();
+  await delay(100); */
 
   const elements = document.querySelectorAll(".plate-to-export");
   if (elements.length === 0) {
@@ -293,14 +293,14 @@ const exportToPDF = async () => {
 };
 
 const submitForm = async () => {
-  await nextTick(); // DOM 업데이트 기다림
+  /* await nextTick(); */ // DOM 업데이트 기다림
   if (data.value.authority === "custom") {
     data.value.authority = customAuthority.value;
   }
 
   // 재렌더링을 위해 먼저 false 처리
   showPlates.value = false;
-  await nextTick(); // DOM 업데이트 기다림
+  /* await nextTick(); */ // DOM 업데이트 기다림
 
   /* const formData = new FormData();
   formData.append("authority", data.value.authority);
