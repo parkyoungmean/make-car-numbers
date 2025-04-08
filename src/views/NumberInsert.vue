@@ -54,12 +54,26 @@
           />
         </div>
 
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-link">[번호 생성]</button>
+          </div>
+          <div class="control">
+            <button type="button" class="button" @click="goToMain">취소</button>
+          </div>
+          <div class="control">
+            <button class="button is-success" @click="exportToPDF">
+              PDF 저장
+            </button>
+          </div>
+        </div>
+
         <!-- 임시운행번호판 SVG -->
         <div v-for="num in generatedNumbers" :key="num">
           <svg
             viewBox="0 0 520 110"
             xmlns="http://www.w3.org/2000/svg"
-            class="w-[520px] h-[110px] border border-black bg-white mb-4"
+            class="plate-to-export w-[520px] h-[110px] border border-black bg-white mb-4"
           >
             <!-- 외곽 테두리 -->
             <rect
@@ -72,59 +86,49 @@
             />
 
             <!-- 대각선 선 두 줄 -->
-            <svg class="absolute top-0 left-0 w-full h-full">
-              <line
-                x1="181"
-                y1="110"
-                x2="390"
-                y2="0"
-                stroke="red"
-                stroke-width="3"
-              />
-              <line
-                x1="254"
-                y1="110"
-                x2="463"
-                y2="0"
-                stroke="red"
-                stroke-width="3"
-              />
-            </svg>
+            <line
+              x1="181"
+              y1="110"
+              x2="390"
+              y2="0"
+              stroke="red"
+              stroke-width="3"
+            />
+            <line
+              x1="254"
+              y1="110"
+              x2="463"
+              y2="0"
+              stroke="red"
+              stroke-width="3"
+            />
 
             <!-- 날짜 영역 -->
-            <text x="30" y="35" font-size="25" font-weight="bold" fill="black">
+            <text x="30" y="35" font-size="23" font-weight="bold" fill="black" font-family="Nanum Gothic">
               {{ formattedStartDate }}
             </text>
-            <text x="30" y="60" font-size="25" font-weight="bold" fill="black">
+            <text x="30" y="60" font-size="23" font-weight="bold" fill="black" font-family="Nanum Gothic">
               ~{{ formattedEndDate }} 까지
             </text>
-            <text x="35" y="90" font-size="27" font-weight="bold" fill="black">
+            <text x="35" y="90" font-size="25" font-weight="bold" fill="black" font-family="Nanum Gothic">
               {{ data.authority }}
             </text>
 
             <!-- 숫자 번호 -->
             <text
               x="325"
-              y="90"
+              y="88"
               font-size="100"
               font-weight="bold"
               text-anchor="middle"
               fill="black"
               letter-spacing="8"
-              font-family="Arial, sans-serif"
+              font-family="Roboto Mono"
+              monospace
             >
               {{ num }}
             </text>
           </svg>
-        </div>
-
-        <div class="field is-grouped">
-          <div class="control">
-            <button class="button is-link">[번호 생성]</button>
-          </div>
-          <div class="control">
-            <button type="button" class="button" @click="goToMain">취소</button>
-          </div>
         </div>
       </div>
     </form>
@@ -132,26 +136,20 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 /* import { useNumberStore } from '../store/numberStore'; */
 import { useRouter } from "vue-router";
 /* const numberStore = useNumberStore(); */
+import jsPDF from "jspdf";
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const router = useRouter();
 const data = ref({
   authority: "",
   startNumber: "",
   endNumber: "",
 });
-
-const validUntil = ref("2025-04-30");
-
-// 날짜 입력용 값 (HTML date input에 사용)
-const dateInput = ref("2025-04-30");
-
-// 날짜 변경 시 유효기간 갱신
-const updateDate = () => {
-  validUntil.value = formatDate(dateInput.value);
-};
 
 const startDateInput = ref("2025-04-06");
 const endDateInput = ref("2025-04-15");
@@ -171,8 +169,7 @@ const updateEnd = () => {
   formattedEndDate.value = formatDate(endDateInput.value, true);
 };
 
-
-const padNumber = (num) => num.toString().padStart(5, '0');
+const padNumber = (num) => num.toString().padStart(5, "0");
 
 const generatedNumbers = computed(() => {
   const start = parseInt(data.value.startNumber);
@@ -185,14 +182,67 @@ const generatedNumbers = computed(() => {
   return range;
 });
 
+const exportToPDF = async () => {
+  await nextTick();
+  await delay(100);
+
+  const elements = document.querySelectorAll(".plate-to-export");
+  if (elements.length === 0) {
+    alert("번호판이 생성되지 않았습니다. 먼저 번호 생성 버튼을 눌러주세요.");
+    return;
+  }
+
+  const pdf = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: [520 / 3.78, 110 / 3.78],
+  });
+
+  for (let i = 0; i < elements.length; i++) {
+    const svgElement = elements[i];
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgElement);
+    const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const img = new Image();
+    img.src = url;
+
+    await new Promise((resolve) => {
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 520 * 2;
+        canvas.height = 110 * 2;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const imgData = canvas.toDataURL("image/jpeg");
+        const width = 520 / 3.78;
+        const height = 110 / 3.78;
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+
+        URL.revokeObjectURL(url);
+        resolve();
+      };
+    });
+  }
+
+  pdf.save("license_plates.pdf");
+};
+
 const submitForm = async () => {
   const formData = new FormData();
-  formData.append("region", data.value.authority);
-  formData.append("first", data.value.firstNumber);
-  formData.append("last", data.value.lastNumber);
+  formData.append("authority", data.value.authority);
+  formData.append("start", data.value.startNumber);
+  formData.append("end", data.value.endNumber);
   /* await numberStore.insertData(formData); */
 };
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+* {
+  font-family: 'Nanum Gothic', sans-serif;
+}
 </style>
