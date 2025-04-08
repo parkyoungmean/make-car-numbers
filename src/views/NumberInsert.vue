@@ -1,178 +1,181 @@
 <template>
-  <div class="content">
-    <form @submit.prevent="submitForm">
-      <div class="flex flex-col items-center p-10 space-y-6">
-        <!-- 시작일 & 종료일 선택기 -->
-        <div class="flex space-x-4 items-center">
-          <label class="text-lg font-semibold">시작일:</label>
-          <input
-            type="date"
-            v-model="startDateInput"
-            @change="updateStart"
-            class="border px-2 py-1 rounded"
-          />
-          <label class="text-lg font-semibold">종료일:</label>
-          <input
-            type="date"
-            v-model="endDateInput"
-            @change="updateEnd"
-            class="border px-2 py-1 rounded"
-          />
-        </div>
-
-        <!-- 관할 기관 드롭다운 -->
-        <div class="flex items-center space-x-4">
-          <label class="text-lg font-semibold">관할 기관:</label>
-          <select v-model="data.authority" class="border px-2 py-1 rounded">
-            <option disabled value="">선택 또는 직접 입력</option>
-            <option value="화성시장">화성시장</option>
-            <option value="서울특별시장">서울특별시장</option>
-            <option value="부산광역시장">부산광역시장</option>
-            <option value="경기도지사">경기도지사</option>
-            <option value="제주도지사">제주도지사</option>
-            <option value="custom">직접 입력</option>
-          </select>
-          <input
-            v-if="data.authority === 'custom'"
-            type="text"
-            v-model="customAuthority"
-            placeholder="기관명을 입력하세요."
-            class="border px-2 py-1 rounded"
-          />
-        </div>
-
-        <!-- 번호 입력 -->
-        <div class="flex space-x-4 items-center">
-          <label class="text-lg font-semibold">시작 번호:</label>
-          <input
-            type="text"
-            v-model="data.startNumber"
-            maxlength="5"
-            class="border px-2 py-1 rounded w-32 text-center"
-            placeholder="숫자 5자리"
-          />
-          <label for="" class="text-lg font-semibold">종료 번호:</label>
-          <input
-            type="text"
-            v-model="data.endNumber"
-            maxlength="5"
-            class="border px-2 py-1 rounded w-32 text-center"
-            placeholder="숫자 5자리"
-          />
-        </div>
-
-        <div class="field is-grouped flex space-x-4">
-          <div class="control">
-            <button
-              class="button px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"
-            >
-              번호 생성
-            </button>
+  <div class="content" style="height: 100vh; display: flex; flex-direction: column;">
+    <div style="position: sticky; top: 90px; background-color: white; z-index: 10; padding-top: 5px;">
+      <form @submit.prevent="submitForm">
+        <div class="flex flex-col items-center space-y-6">
+          <!-- 시작일 & 종료일 선택기 -->
+          <div class="flex space-x-4 items-center">
+            <label class="text-lg font-semibold">시작일:</label>
+            <input
+              type="date"
+              v-model="startDateInput"
+              @change="updateStart"
+              class="border px-2 py-1 rounded"
+            />
+            <label class="text-lg font-semibold">종료일:</label>
+            <input
+              type="date"
+              v-model="endDateInput"
+              @change="updateEnd"
+              class="border px-2 py-1 rounded"
+            />
           </div>
-          <div class="control">
-            <button
-              class="button px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition"
-              @click="exportToPDF"
-            >
-              PDF 저장
-            </button>
+
+          <!-- 관할 기관 드롭다운 -->
+          <div class="flex items-center space-x-4">
+            <label class="text-lg font-semibold">관할 기관:</label>
+            <select v-model="data.authority" class="border px-2 py-1 rounded">
+              <option disabled value="">선택 또는 직접 입력</option>
+              <option value="화성시장">화성시장</option>
+              <option value="서울특별시장">서울특별시장</option>
+              <option value="부산광역시장">부산광역시장</option>
+              <option value="경기도지사">경기도지사</option>
+              <option value="제주도지사">제주도지사</option>
+              <option value="custom">직접 입력</option>
+            </select>
+            <input
+              v-if="data.authority === 'custom'"
+              type="text"
+              v-model="customAuthority"
+              placeholder="기관명을 입력하세요."
+              class="border px-2 py-1 rounded"
+            />
           </div>
-          <div class="control">
-            <button
-              type="button"
-              class="button px-6 py-2 bg-gray-200 text-gray-800 rounded shadow hover:bg-gray-400 transition"
-              @click="reset"
-            >
-              취소
-            </button>
+
+          <!-- 번호 입력 -->
+          <div class="flex space-x-4 items-center">
+            <label class="text-lg font-semibold">시작 번호:</label>
+            <input
+              type="text"
+              v-model="data.startNumber"
+              maxlength="5"
+              class="border px-2 py-1 rounded w-32 text-center"
+              placeholder="숫자 5자리"
+            />
+            <label for="" class="text-lg font-semibold">종료 번호:</label>
+            <input
+              type="text"
+              v-model="data.endNumber"
+              maxlength="5"
+              class="border px-2 py-1 rounded w-32 text-center"
+              placeholder="숫자 5자리"
+            />
+          </div>
+
+          <div class="field is-grouped flex space-x-4 pb-5">
+            <div class="control">
+              <button
+                class="button px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"
+              >
+                번호 생성
+              </button>
+            </div>
+            <div class="control">
+              <button
+                class="button px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition"
+                @click="exportToPDF"
+              >
+                PDF 저장
+              </button>
+            </div>
+            <div class="control">
+              <button
+                type="button"
+                class="button px-6 py-2 bg-gray-200 text-gray-800 rounded shadow hover:bg-gray-400 transition"
+                @click="reset"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </div>
+      </form>
+    </div>
 
-        <!-- 임시운행번호판 SVG -->
-        <div v-show="showPlates" v-for="num in generatedNumbers" :key="num">
-          <svg
-            viewBox="0 0 520 110"
-            xmlns="http://www.w3.org/2000/svg"
-            class="plate-to-export w-[520px] h-[110px] border border-black bg-white mb-4"
+    <div style="overflow-y: auto; flex: 1; padding: 20px;">
+      <div v-show="showPlates" v-for="num in generatedNumbers" :key="num">
+        <svg
+          viewBox="0 0 520 110"
+          xmlns="http://www.w3.org/2000/svg"
+          class="plate-to-export w-[520px] h-[110px] border border-black bg-white mb-4"
+        >
+          <!-- 외곽 테두리 -->
+          <rect
+            x="0"
+            y="0"
+            width="520"
+            height="110"
+            fill="white"
+            stroke="black"
+          />
+
+          <!-- 대각선 선 두 줄 -->
+          <line
+            x1="181"
+            y1="110"
+            x2="390"
+            y2="0"
+            stroke="red"
+            stroke-width="3"
+          />
+          <line
+            x1="254"
+            y1="110"
+            x2="463"
+            y2="0"
+            stroke="red"
+            stroke-width="3"
+          />
+
+          <!-- 날짜 영역 -->
+          <text
+            x="30"
+            y="35"
+            font-size="23"
+            font-weight="bold"
+            fill="black"
+            font-family="Nanum Gothic"
           >
-            <!-- 외곽 테두리 -->
-            <rect
-              x="0"
-              y="0"
-              width="520"
-              height="110"
-              fill="white"
-              stroke="black"
-            />
+            {{ formattedStartDate }}
+          </text>
+          <text
+            x="30"
+            y="60"
+            font-size="23"
+            font-weight="bold"
+            fill="black"
+            font-family="Nanum Gothic"
+          >
+            ~{{ formattedEndDate }} 까지
+          </text>
+          <text
+            x="35"
+            y="90"
+            font-size="25"
+            font-weight="bold"
+            fill="black"
+            font-family="Nanum Gothic"
+          >
+            {{ data.authority }}
+          </text>
 
-            <!-- 대각선 선 두 줄 -->
-            <line
-              x1="181"
-              y1="110"
-              x2="390"
-              y2="0"
-              stroke="red"
-              stroke-width="3"
-            />
-            <line
-              x1="254"
-              y1="110"
-              x2="463"
-              y2="0"
-              stroke="red"
-              stroke-width="3"
-            />
-
-            <!-- 날짜 영역 -->
-            <text
-              x="30"
-              y="35"
-              font-size="23"
-              font-weight="bold"
-              fill="black"
-              font-family="Nanum Gothic"
-            >
-              {{ formattedStartDate }}
-            </text>
-            <text
-              x="30"
-              y="60"
-              font-size="23"
-              font-weight="bold"
-              fill="black"
-              font-family="Nanum Gothic"
-            >
-              ~{{ formattedEndDate }} 까지
-            </text>
-            <text
-              x="35"
-              y="90"
-              font-size="25"
-              font-weight="bold"
-              fill="black"
-              font-family="Nanum Gothic"
-            >
-              {{ data.authority }}
-            </text>
-
-            <!-- 숫자 번호 -->
-            <text
-              x="325"
-              y="88"
-              font-size="100"
-              font-weight="bold"
-              text-anchor="middle"
-              fill="black"
-              letter-spacing="8"
-              font-family="Roboto Mono"
-              monospace
-            >
-              {{ num }}
-            </text>
-          </svg>
-        </div>
+          <!-- 숫자 번호 -->
+          <text
+            x="325"
+            y="88"
+            font-size="100"
+            font-weight="bold"
+            text-anchor="middle"
+            fill="black"
+            letter-spacing="8"
+            font-family="Roboto Mono"
+            monospace
+          >
+            {{ num }}
+          </text>
+        </svg>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -207,8 +210,6 @@ const formatDate = (dateStr, short = false) => {
 
 const formattedStartDate = ref(formatDate(today));
 const formattedEndDate = ref(formatDate(today, true));
-
-
 
 const updateStart = () => {
   formattedStartDate.value = formatDate(startDateInput.value);
@@ -301,10 +302,10 @@ const submitForm = async () => {
   showPlates.value = false;
   await nextTick(); // DOM 업데이트 기다림
 
-  const formData = new FormData();
+  /* const formData = new FormData();
   formData.append("authority", data.value.authority);
   formData.append("start", data.value.startNumber);
-  formData.append("end", data.value.endNumber);
+  formData.append("end", data.value.endNumber); */
   /* await numberStore.insertData(formData); */
 
   showPlates.value = true; // 다시 보여줌
