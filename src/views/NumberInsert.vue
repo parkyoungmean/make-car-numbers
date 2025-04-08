@@ -54,17 +54,17 @@
           />
         </div>
 
-        <div class="field is-grouped">
+        <div class="field is-grouped flex space-x-4">
           <div class="control">
-            <button class="button is-link">[번호 생성]</button>
+            <button class="button px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition">[번호 생성]</button>
           </div>
           <div class="control">
-            <button type="button" class="button" @click="goToMain">취소</button>
-          </div>
-          <div class="control">
-            <button class="button is-success" @click="exportToPDF">
+            <button class="button px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition" @click="exportToPDF">
               PDF 저장
             </button>
+          </div>
+          <div class="control">
+            <button type="button" class="button px-6 py-2 bg-gray-200 text-gray-800 rounded shadow hover:bg-gray-400 transition" @click="goToMain">취소</button>
           </div>
         </div>
 
