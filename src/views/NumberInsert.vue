@@ -57,7 +57,7 @@
 
         <div class="field is-grouped flex space-x-4">
           <div class="control">
-            <button class="button px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition">[번호 생성]</button>
+            <button class="button px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition">번호 생성</button>
           </div>
           <div class="control">
             <button class="button px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition" @click="exportToPDF">
@@ -65,7 +65,7 @@
             </button>
           </div>
           <div class="control">
-            <button type="button" class="button px-6 py-2 bg-gray-200 text-gray-800 rounded shadow hover:bg-gray-400 transition" @click="goToMain">취소</button>
+            <button type="button" class="button px-6 py-2 bg-gray-200 text-gray-800 rounded shadow hover:bg-gray-400 transition" @click="reset">취소</button>
           </div>
         </div>
 
@@ -187,12 +187,19 @@ const generatedNumbers = computed(() => {
   return range;
 });
 
-/* watch(customAuthority, (val) => {
-  console.log('vla값:', val);
-    if (data.value.authority === 'custom' || data.value.authority === val) {
-    data.value.authority = val;
-  }
-}); */
+
+
+const reset = () => {
+  data.value.authority = "";
+  data.value.startNumber = "";
+  data.value.endNumber = "";
+  customAuthority.value = "";
+  startDateInput.value = "2025-04-06";
+  endDateInput.value = "2025-04-15";
+  formattedStartDate.value = "25.04.06";
+  formattedEndDate.value = "04.15";
+  showPlates.value = false;
+};
 
 const exportToPDF = async () => {
   await nextTick();
