@@ -32,7 +32,13 @@
             <option value="제주도지사">제주도지사</option>
             <option value="custom">직접 입력</option>
           </select>
-          <input v-if="data.authority === 'custom'" type="text" v-model="customAuthority" placeholder="기관명을 입력하세요." class="border px-2 py-1 rounded">
+          <input
+            v-if="data.authority === 'custom'"
+            type="text"
+            v-model="customAuthority"
+            placeholder="기관명을 입력하세요."
+            class="border px-2 py-1 rounded"
+          />
         </div>
 
         <!-- 번호 입력 -->
@@ -57,15 +63,28 @@
 
         <div class="field is-grouped flex space-x-4">
           <div class="control">
-            <button class="button px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition">번호 생성</button>
+            <button
+              class="button px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition"
+            >
+              번호 생성
+            </button>
           </div>
           <div class="control">
-            <button class="button px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition" @click="exportToPDF">
+            <button
+              class="button px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition"
+              @click="exportToPDF"
+            >
               PDF 저장
             </button>
           </div>
           <div class="control">
-            <button type="button" class="button px-6 py-2 bg-gray-200 text-gray-800 rounded shadow hover:bg-gray-400 transition" @click="reset">취소</button>
+            <button
+              type="button"
+              class="button px-6 py-2 bg-gray-200 text-gray-800 rounded shadow hover:bg-gray-400 transition"
+              @click="reset"
+            >
+              취소
+            </button>
           </div>
         </div>
 
@@ -105,13 +124,34 @@
             />
 
             <!-- 날짜 영역 -->
-            <text x="30" y="35" font-size="23" font-weight="bold" fill="black" font-family="Nanum Gothic">
+            <text
+              x="30"
+              y="35"
+              font-size="23"
+              font-weight="bold"
+              fill="black"
+              font-family="Nanum Gothic"
+            >
               {{ formattedStartDate }}
             </text>
-            <text x="30" y="60" font-size="23" font-weight="bold" fill="black" font-family="Nanum Gothic">
+            <text
+              x="30"
+              y="60"
+              font-size="23"
+              font-weight="bold"
+              fill="black"
+              font-family="Nanum Gothic"
+            >
               ~{{ formattedEndDate }} 까지
             </text>
-            <text x="35" y="90" font-size="25" font-weight="bold" fill="black" font-family="Nanum Gothic">
+            <text
+              x="35"
+              y="90"
+              font-size="25"
+              font-weight="bold"
+              fill="black"
+              font-family="Nanum Gothic"
+            >
               {{ data.authority }}
             </text>
 
@@ -152,20 +192,23 @@ const data = ref({
   endNumber: "",
 });
 
-const customAuthority = ref('');
+const customAuthority = ref("");
 
 const showPlates = ref(false);
 
-const startDateInput = ref("2025-04-06");
-const endDateInput = ref("2025-04-15");
-
-const formattedStartDate = ref("25.04.06");
-const formattedEndDate = ref("04.15");
+const today = new Date().toISOString().split("T")[0];
+const startDateInput = ref(today);
+const endDateInput = ref(today);
 
 const formatDate = (dateStr, short = false) => {
   const [yyyy, mm, dd] = dateStr.split("-");
   return short ? `${mm}.${dd}` : `${yyyy.slice(2)}.${mm}.${dd}`;
 };
+
+const formattedStartDate = ref(formatDate(today));
+const formattedEndDate = ref(formatDate(today, true));
+
+
 
 const updateStart = () => {
   formattedStartDate.value = formatDate(startDateInput.value);
@@ -187,17 +230,15 @@ const generatedNumbers = computed(() => {
   return range;
 });
 
-
-
 const reset = () => {
   data.value.authority = "";
   data.value.startNumber = "";
   data.value.endNumber = "";
   customAuthority.value = "";
-  startDateInput.value = "2025-04-06";
-  endDateInput.value = "2025-04-15";
-  formattedStartDate.value = "25.04.06";
-  formattedEndDate.value = "04.15";
+  startDateInput.value = today;
+  endDateInput.value = today;
+  formattedStartDate.value = formatDate(today);
+  formattedEndDate.value = formatDate(today, true);
   showPlates.value = false;
 };
 
@@ -252,11 +293,11 @@ const exportToPDF = async () => {
 
 const submitForm = async () => {
   await nextTick(); // DOM 업데이트 기다림
-  if (data.value.authority === 'custom') {
+  if (data.value.authority === "custom") {
     data.value.authority = customAuthority.value;
   }
 
-// 재렌더링을 위해 먼저 false 처리
+  // 재렌더링을 위해 먼저 false 처리
   showPlates.value = false;
   await nextTick(); // DOM 업데이트 기다림
 
@@ -271,8 +312,8 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
 * {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: "Nanum Gothic", sans-serif;
 }
 </style>
