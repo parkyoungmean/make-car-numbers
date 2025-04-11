@@ -293,14 +293,36 @@ const exportToPDF = async () => {
 };
 
 const submitForm = async () => {
-  /* await nextTick(); */ // DOM 업데이트 기다림
+  await nextTick(); // DOM 업데이트 기다림
+
   if (data.value.authority === "custom") {
     data.value.authority = customAuthority.value;
   }
 
+  if (!data.value.authority || data.value.authority.trim() === '') {
+    alert('관할 기관을 입력하거나 선택해주세요.');
+    return;
+  }
+
+  const startStr = data.value.startNumber;
+  const endStr = data.value.endNumber;
+
+    if (startStr.length !== 5 || endStr.length !== 5 || isNaN(Number(startStr)) || isNaN(Number(endStr))) {
+    alert('시작 번호와 종료 번호는 5자리 숫자여야 합니다.');
+    return;
+  }
+
+  const start = parseInt(startStr, 10);
+  const end = parseInt(endStr, 10);
+
+  if (start > end) {
+    alert('시작 번호는 종료 번호보다 작거나 같아야 합니다.');
+    return;
+  }
+
   // 재렌더링을 위해 먼저 false 처리
   showPlates.value = false;
-  /* await nextTick(); */ // DOM 업데이트 기다림
+  await nextTick(); // DOM 업데이트 기다림
 
   /* const formData = new FormData();
   formData.append("authority", data.value.authority);
